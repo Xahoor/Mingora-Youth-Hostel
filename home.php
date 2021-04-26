@@ -40,9 +40,16 @@ nav .active a{
 }
 
 
-body{
-    background-color: red;
-}
+
+@media only screen and (max-width: 500px) {
+   
+    .navbar-nav .btn{
+          text-align: left;
+    }
+
+    
+   
+  }
 
 .margin {
     margin-top: 100px;
@@ -53,15 +60,28 @@ body{
 .tales {
   width: 100%;
   height: 650px;
+ 
+    
+    
 }
 
 .carousel-inner{
   width:100%;
+ 
   
 }
-.carousel-control-prev{
-    
+
+.carousel-item:after {
+  content:"";
+  display:block;
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  background:rgba(0,0,0,0.5);
 }
+
 .carousel-control-prev .carousel-control-prev-icon,.carousel-control-next .carousel-control-next-icon {
     background-color: rgba(0,0,0,.2);
     width: 40px;
@@ -71,6 +91,46 @@ body{
     
 }
 
+.carousel-caption {
+  top: 10%;
+  bottom: auto;
+  left: 10%;
+  right: auto;
+  text-align: left;
+  
+}
+
+.carousel-caption h5{
+  color: #eee;
+  
+}
+
+.carousel-caption h5 span{
+  color: #90ee90;
+  font-weight: 700;
+  border-bottom: 1px solid #90ee90;
+}
+
+.carousel-caption .button{
+
+  text-decoration: none;
+      margin-top: 20px;
+      border: 1px solid #eee;
+      background-color: transparent;
+      color: #eee;
+      border-radius: 5px;
+      padding: 5px;
+      font-size: 21px;
+}
+
+
+.carousel-caption .button:hover{
+
+      border: 1px solid #eee;
+      background-color: #eee;
+      color: #333;
+     
+}
 
 </style>
 <body>
@@ -85,18 +145,18 @@ body{
     <span class="navbar-toggler-icon"></span>
   </button>
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+  <div class="collapse navbar-collapse " id="navbarSupportedContent">
     
-    <ul class="navbar-nav ml-auto" >
-      <li class="nav-item active" id="home">
+    <ul class="navbar-nav ml-auto bg-light" id="myDIV">
+      <li class="nav-item btn active" id="home">
         <a class="nav-link mr-lg-3" href="#" onclick="myFunction1()">Home <span class="sr-only">(current)</span></a>
       </li>
-      <li class="nav-item" >
+      <li class="nav-item btn" >
         <a class="nav-link mr-lg-3" href="#" onclick="myFunction2()">About Us</a>
       </li>
       
-      <li class="nav-item">
-        <a class="nav-link mr-lg-3" href="#contact-us">Login</a>	
+      <li class="nav-item btn">
+        <a class="nav-link mr-lg-3" href="" type="button" data-toggle="modal" data-target="#signinModal">Login</a>	
       </li>
     </ul>
     
@@ -118,25 +178,28 @@ body{
     <li data-target="#carouselExampleCaptions" data-slide-to="2"></li>
   </ol>
   <div class="carousel-inner">
-    <div class="carousel-item active">
+    <div class="carousel-item active dark-overlay">
       <img src="assets/images/c1.jpg" class="img-fluid tales" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>First slide label</h5>
-        <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+      <div class="carousel-caption d-md-block ">
+        <h5>Mingora <span> Youth Hostel </span></h5><br>
+        <a href="#" class="button" onclick="myFunction3()">Register Now</a>
+        
       </div>
     </div>
     <div class="carousel-item">
       <img src="assets/images/c2.jpg" class="d-block w-100 tales" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>Second slide label</h5>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+      <div class="carousel-caption  d-md-block">
+        <h5>Mingora <span> Youth Hostel </span></h5><br>
+        <a href="#" class="button" onclick="myFunction3()">Register Now</a>
+
       </div>
     </div>
     <div class="carousel-item">
       <img src="assets/images/c3.jpg" class="d-block w-100 tales" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>Third slide label</h5>
-        <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
+      <div class="carousel-caption d-md-block">
+      <h5>Mingora <span> Youth Hostel </span></h5><br>
+      <a href="#" class="button" onclick="myFunction3()">Register Now</a>
+
       </div>
     </div>
   </div>
@@ -157,35 +220,438 @@ body{
 
 <!-- about us  start -->
 
+<style>
+  #about{
+    display: none;
+  }
+  .location h2{
+      text-align: center;
+  }
+
+  #about .container-fluid{
+    margin-top: 80px;
+    height: 300px;
+    background-color: #666;
+    color: #fff;
+  }
+
+  .container-fluid .contact{
+    font-size: 25px;
+    font-weight: 600;
+    padding: 20px;
+  }
+
+  .contact span{
+    border-bottom: 1px solid #eee;
+  }
+
+  footer p{
+    line-height: 40px;
+    
+  }
+
+  .platforms i{
+    font-size: 30px;
+    margin: 10px 10px;
+  }
+
+  .platforms .fa-facebook-square{
+    color: #3b5998;
+    background-color: #eee;
+  }
+
+  .platforms .fa-instagram{
+    background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+  }
+
+  .platforms .fa-youtube{
+    color: red;
+    background-color: #fff;
+  }
+
+  .platforms .fa-twitter-square{
+    color: #00acee;
+    background-color: #fff;
+  }
+
+  footer img{
+    margin-top: -75px;
+    width: 100%;
+    height: 300px;
+  }
+
+  @media only screen and (max-width: 600px) {
+    footer img{
+      margin-top: 0px;
+    }
+
+    .navbar ul{
+      margin-right: auto;
+    }
+  }
+ 
+</style>
+
+
 <section id="about" class="margin">
-about us
+
+  <div class="container">
+      <div class="row">
+
+          <div class="col-md-6">
+          <h2>About Hostel</h2>
+          <p>
+              We are located in the historical heart of beautiful Florence, near to all the touristic monuments, just a step from Signoria Square and less 
+              than 1 minute walking to Uffizi Gallery - Old Bridge "Ponte Vecchio" and the Duomo Cathedral "Santa Maria del Fiore".
+          </p>
+          <p>This make Florence Youth Hostel a great starting point for exploring treasures that Florence has to offer. Forget about spending money on buses 
+            and taxis. Everything that you may care to see is within a walking distance from our place
+          </p>
+          </div>
+
+          <div class="col-md-6 location">
+            <h2>Location</h2>
+            
+            <image src="assets/images/location.jpg" class="map-image"></image>
+            
+
+
+          </div>
+      </div>
+  </div>
+  <footer>
+        <div class="container-fluid">
+          <div class="row contact"> <span> Contact Us </span></div>
+        <div class="row">
+            <div class="col-md-4">
+            <p><i class="fa fa-phone"></i> 0946-700400 <br> <i class="fa fa-mobile"></i> 0346-955334 <br> <i class="fa fa-mobile"></i> 0344-9356653 <br> 
+            <i class="far fa-envelope"></i> myh@gmail.com</p>
+            </div>
+
+            <div class="col-md-4 platforms">
+            <h4>Follow us</h4>
+            <i class="fab fa-facebook-square"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-youtube"></i>
+            <i class="fab fa-twitter-square"></i>
+            </div>
+
+            <div class="col-md-4">
+                <img src="assets/images/logo1.png" alt="">
+            </div>
+
+        </div>
+        </div>
+  </footer>
 </section>
 
 <!-- about us end -->
 
 
+<style>
+
+  .modal-header{
+    border-bottom: none;
+  }
+</style>
+
+<!-- login modal start -->
+
+<div class="modal fade" id="signinModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+
+      <form class="form" >
+  
+  
+  <div class="input-group mb-3">
+<div class="input-group-prepend">
+<span class="input-group-text" id="basic-addon1"><i class="fas fa-at"></i></span>
+</div>
+<input type="email" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="basic-addon1">
+</div>
+
+<div class="input-group mb-3">
+<div class="input-group-prepend">
+<span class="input-group-text" id="basic-addon1"><i class="fas fa-unlock"></i></span>
+</div>
+<input type="password" class="form-control" id="mypass" placeholder="Password" aria-label="Username" aria-describedby="basic-addon1">
+</div>
+
+
+<div class="form-check">
+    <input type="checkbox" onclick="myPassword()"  class="form-check-input" id="exampleCheck1">
+    <label class="form-check-label" for="exampleCheck1">Show Password</label>
+  </div>
+
+
+
+<div class="input-group">
+<a href="buyAndSell/dashboard.php" target="_blank" id="loogin1">
+<!-- <input type="submit" class="btn btn-primary form-control" href="buyAnsSale/dashbaord.php" value="Login"> -->
+Login
+</a>
+</div>
+
+
+
+
+</form>
+
+
+      </div>
+     
+    </div>
+  </div>
+</div>
+
+
+<style>
+  #loogin1{
+    text-decoration: none;
+    color: white;
+    width: 100%;
+    background-color: #0275d8;
+    padding: 5px;
+    text-align: center;
+    border-radius: 5px;
+  }
+</style>
+
+<!-- login modal end -->
+
+<!-- registration start -->
+
+<style>
+  #register{
+    display: none;
+    background: url("assets/images/c1.jpg");
+    height: 630px;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100%;
+    -moz-background-imgae: cover;
+    -o-background-imgae: cover;
+    -webkit-background-imgae: cover;
+     width: 100%;
+  }
+
+
+  
+
+@media only screen and (max-width: 500px) {
+  #register{
+
+
+    background-size: cover;
+    height: cover;
+  }
+
+}
+
+  #register .container{
+    padding-top: 20px;
+    margin-top: 120px;
+    
+  }
+
+  .rform{
+      background-color: rgba(0,0,0,.5);
+      padding: 20px;
+      border-radius: 5px;
+  }
+
+  #register .form-check{
+    color: #fff;
+  }
+
+  #register #picture{
+    display: none;
+  }
+
+  #register #spicture{
+    background-color: #fff;
+    padding: 5px 10px;
+    border: 1px solid #fff;
+    border-radius: 5px;
+
+  }
+
+  #register #output{
+    margin-left: 20px;
+    width: 50px;
+    height: 50px;
+    padding: 0 ;
+    
+    
+  }
+ 
+</style>
+
+
+<section id="register">
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+        
+
+        <form class="rform" >
+  
+        <div class="input-group mb-3">
+<div class="input-group-prepend">
+<span class="input-group-text" id="basic-addon1"><i class="fas fa-user"></i></span>
+</div>
+<input type="text" class="form-control" placeholder="Full Name" aria-describedby="basic-addon1">
+</div>
+  
+  <div class="input-group mb-3">
+<div class="input-group-prepend">
+<span class="input-group-text" id="basic-addon2"><i class="fas fa-at"></i></span>
+</div>
+<input type="email" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="basic-addon2">
+</div>
+
+
+<div class="input-group mb-3">
+<div class="input-group-prepend">
+<span class="input-group-text" id="basic-addon3"><i class="fas fa-unlock"></i></span>
+</div>
+<input type="password" class="form-control" id="mypass2" placeholder="Password" aria-label="Username" aria-describedby="basic-addon3">
+</div>
+
+<div class="form-check">
+    <input type="checkbox" onclick="myPassword()"  class="form-check-input" id="exampleCheck2">
+    <label class="form-check-label" for="exampleCheck2">Show Password</label>
+  </div>
+
+
+
+  <div class="input-group mb-3">
+<div class="input-group-prepend">
+<span class="input-group-text" id="basic-addon4"><i class="fas fa-phone"></i></span>
+</div>
+<input type="number" class="form-control"  placeholder="Phone (0344-377373733)" aria-label="Username" aria-describedby="basic-addon4">
+</div>
+
+
+<div class="input-group mb-3">
+<div class="input-group-prepend">
+<span class="input-group-text" id="basic-addon5"><i class="far fa-credit-card"></i></span>
+</div>
+<input type="number" class="form-control"  placeholder="CNIC" aria-label="Username" aria-describedby="basic-addon5">
+</div>
+
+
+
+<div class="input-group mb-3 pictureBorder">
+
+<label for="picture" id="spicture"> <i class="fas fa-image"></i> Select Picture</label>
+<input type="file" id="picture" accept="image/*" onchange="loadFile(event)">
+<img id="output"/>
+</div>
+
+
+
+<div class="input-group">
+  
+    <input type="button" class="btn btn-primary form-control" value="Register">
+    
+</div>
+
+
+
+</form>
+
+
+
+        </div>
+    </div>
+</div>
+
+</section>
+
+
+<!-- registration end -->
 
 <script>
+
+var header = document.getElementById("myDIV");
+var btns = header.getElementsByClassName("btn");
+for (var i = 0; i < btns.length; i++) {
+  btns[i].addEventListener("click", function() {
+  var current = document.getElementsByClassName("active");
+  current[0].className = current[0].className.replace(" active", "");
+  this.className += " active";
+  });
+}
+
+
+
+var loadFile = function(event) {
+    var output = document.getElementById('output');
+    output.src = URL.createObjectURL(event.target.files[0]);
+    output.onload = function() {
+      URL.revokeObjectURL(output.src) // free memory
+    }
+  };
+</script>
+
+<script>
+
+function myPassword() {
+  var x = document.getElementById("mypass");
+  var y = document.getElementById("mypass2");
+
+
+  if (x.type === "password") {
+    x.type = "text";
+  } else {
+    x.type = "password";
+  }
+
+  if (y.type === "password") {
+    y.type = "text";
+  } else {
+    y.type = "password";
+  }
+ 
+}
 
 
 
 
 function myFunction1() {
           document.getElementById("about").style.display = "none";
-        
+          document.getElementById("register").style.display = "none";
           document.getElementById("carousel").style.display = "block";
           
         }
 
-
         function myFunction2() {
           document.getElementById("carousel").style.display = "none";
+          document.getElementById("register").style.display = "none";
           document.getElementById("about").style.display = "block";
-          var element = document.getElementById("home");
-  element.classList.remove("active");
+          
         }
 
+      function myFunction3(){
+        document.getElementById("carousel").style.display = "none";
+          document.getElementById("about").style.display = "none";
+          document.getElementById("register").style.display = "block";
+      }
         
+
+
 
 </script>
 
