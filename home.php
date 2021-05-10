@@ -133,7 +133,7 @@ nav .active a{
 }
 
 </style>
-<body>
+<body class="home">
     
 
 
@@ -395,7 +395,7 @@ nav .active a{
 
 
 <div class="input-group">
-<a href="buyAndSell/dashboard.php" target="_blank" id="loogin1">
+<a href="visitor/dashboard.php" target="_blank" id="loogin1">
 <!-- <input type="submit" class="btn btn-primary form-control" href="buyAnsSale/dashbaord.php" value="Login"> -->
 Login
 </a>
@@ -560,19 +560,13 @@ Login
 <img id="output"/>
 </div>
 
-
-
 <div class="input-group">
   
     <input type="button" class="btn btn-primary form-control" value="Register">
     
 </div>
 
-
-
 </form>
-
-
 
         </div>
     </div>
@@ -627,9 +621,6 @@ function myPassword() {
  
 }
 
-
-
-
 function myFunction1() {
           document.getElementById("about").style.display = "none";
           document.getElementById("register").style.display = "none";
@@ -650,11 +641,7 @@ function myFunction1() {
           document.getElementById("register").style.display = "block";
       }
         
-
-
-
 </script>
-
 
 <script src="assets/js/jquery.slim.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
