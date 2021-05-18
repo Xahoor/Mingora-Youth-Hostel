@@ -139,7 +139,7 @@ nav .active a{
 
 
 <nav class="navbar  fixed-top navbar-expand-lg navbar-light bg-light py-0">
-  <a class="navbar-brand mr-5" href="index.php"><img src="assets/images/logo1.png" alt=""></a>
+  <a class="navbar-brand mr-5" href="home.php"><img src="assets/images/logo1.png" alt=""></a>
   <!-- <div class=""><button class="">heading</button></div> -->
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -395,7 +395,7 @@ nav .active a{
 
 
 <div class="input-group">
-<a href="visitor/dashboard.php" target="_blank" id="loogin1">
+<a href="visitor/dashboard.php"  id="loogin1">
 <!-- <input type="submit" class="btn btn-primary form-control" href="buyAnsSale/dashbaord.php" value="Login"> -->
 Login
 </a>
