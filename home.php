@@ -132,6 +132,10 @@ nav .active a{
      
 }
 
+.marginP1{
+  margin-top: 5px;
+}
+
 </style>
 <body class="home">
     
@@ -406,6 +410,8 @@ Login
 
 </form>
 
+<p id="marginP1">Login as <a href="" type="button" data-toggle="modal" data-dismiss="modal" data-target="#adminModal">Administrator</a></p>
+
 
       </div>
      
@@ -427,6 +433,72 @@ Login
 </style>
 
 <!-- login modal end -->
+
+
+<!-- admin login start -->
+<!-- ======================== -->
+
+<div class="modal fade" id="adminModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+
+      <form class="form" >
+  
+  
+  <div class="input-group mb-3">
+<div class="input-group-prepend">
+<span class="input-group-text" id="basic-addon1"><i class="fas fa-at"></i></span>
+</div>
+<input type="email" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="basic-addon1">
+</div>
+
+<div class="input-group mb-3">
+<div class="input-group-prepend">
+<span class="input-group-text" id="basic-addon1"><i class="fas fa-unlock"></i></span>
+</div>
+<input type="password" class="form-control" id="mypass" placeholder="Password" aria-label="Username" aria-describedby="basic-addon1">
+</div>
+
+
+<div class="form-check">
+    <input type="checkbox" onclick="myPassword()"  class="form-check-input" id="exampleCheck1">
+    <label class="form-check-label" for="exampleCheck1">Show Password</label>
+  </div>
+
+
+
+<div class="input-group">
+<a href="admin/dashboard.php" target="_blank"  id="loogin1">
+<!-- <input type="submit" class="btn btn-primary form-control" href="buyAnsSale/dashbaord.php" value="Login"> -->
+Login
+</a>
+</div>
+
+
+
+
+</form>
+
+<p id="marginP1">Login as <a href="" type="button" data-toggle="modal" data-dismiss="modal" data-target="#adminModal">Local</a></p>
+
+
+      </div>
+     
+    </div>
+  </div>
+</div>
+
+
+<!-- ====================== -->
+<!-- admin login end  -->
 
 <!-- registration start -->
 
