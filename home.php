@@ -1,3 +1,9 @@
+<?php
+
+session_start();
+require 'connection.php';
+ob_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +17,11 @@
 <link rel="stylesheet" type="text/css" href="assets/fontawsome/css/all.min.css"/>
 
 <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+<script src="assets/js/sweetalert.min.js"></script>
+
+<script src="assets/js/jquery.js"></script>
+
+
 
 
 
@@ -18,14 +29,17 @@
 
 
 <style>
+
 nav{
     height: 100px;
     background-color: rgba(0,0,0,.2);
 }
 
+
 nav a{
     font-size: 21px;
 }
+
 nav .active a{
     font-weight: 500;
     color: black;
@@ -34,7 +48,6 @@ nav .active a{
 .navbar-brand img{
     width: 100px;
     height: 100px;
-  
     background-color: red;
    margin-top: -10px;
 }
@@ -186,7 +199,7 @@ nav .active a{
       <img src="assets/images/c1.jpg" class="img-fluid tales" alt="...">
       <div class="carousel-caption d-md-block ">
         <h5>Mingora <span> Youth Hostel </span></h5><br>
-        <a href="#" class="button" onclick="myFunction3()">Register Now</a>
+        <a href="#" class="button" id="rnow" onclick="myFunction3()">Register Now</a>
         
       </div>
     </div>
@@ -357,15 +370,51 @@ nav .active a{
   .modal-header{
     border-bottom: none;
   }
+
+  #wrong{
+  display: none;
+  }
 </style>
 
 <!-- login modal start -->
 
+<?php
+ if(isset($_POST["login_btn"])){
+
+    $useremail = $_POST['login_email'];
+    $userpassword = $_POST['login_password'];
+
+    $check_user = "select * from visitors WHERE email = '$useremail' and password = '$userpassword'";
+    $login = mysqli_query($conn,$check_user);
+    if(mysqli_num_rows($login)>0){
+       header("location: visitor/dashboard.php"); 
+    }
+    else{
+      ?>
+
+      <script>
+      
+   
+      $(document).ready(function() {
+        $("#wrong").css("display", "block");
+      $("#signinModal").modal("show");
+    });
+
+      </script>
+
+      <?php
+    }
+    
+
+  }
+?>
 <div class="modal fade" id="signinModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        
+      <div class="alert alert-warning" id="wrong">
+                <strong>Invalid!</strong> Email or Password.
+              </div>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -373,21 +422,21 @@ nav .active a{
       <div class="modal-body">
         
 
-      <form class="form" >
+      <form class="form" method="post" action="home.php">
   
   
   <div class="input-group mb-3">
 <div class="input-group-prepend">
 <span class="input-group-text" id="basic-addon1"><i class="fas fa-at"></i></span>
 </div>
-<input type="email" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="basic-addon1">
+<input type="email" class="form-control" placeholder="Email" name="login_email" value="<?php  if(isset($_POST["login_email"])){echo $_POST["login_email"];} ?>" aria-label="Email" aria-describedby="basic-addon1">
 </div>
 
 <div class="input-group mb-3">
 <div class="input-group-prepend">
 <span class="input-group-text" id="basic-addon1"><i class="fas fa-unlock"></i></span>
 </div>
-<input type="password" class="form-control" id="mypass" placeholder="Password" aria-label="Username" aria-describedby="basic-addon1">
+<input type="password" class="form-control" id="mypass" placeholder="Password" name="login_password" value="" aria-label="Username" aria-describedby="basic-addon1">
 </div>
 
 
@@ -399,10 +448,9 @@ nav .active a{
 
 
 <div class="input-group">
-<a href="visitor/dashboard.php"  id="loogin1">
-<!-- <input type="submit" class="btn btn-primary form-control" href="buyAnsSale/dashbaord.php" value="Login"> -->
-Login
-</a>
+
+<input type="submit" name="login_btn" class="btn btn-primary form-control" href="buyAnsSale/dashbaord.php" value="Login">
+
 </div>
 
 
@@ -487,7 +535,7 @@ Login
 
 </form>
 
-<p id="marginP1">Login as <a href="" type="button" data-toggle="modal" data-dismiss="modal" data-target="#adminModal">Local</a></p>
+<p id="marginP1">Login as <a href="" type="button" data-toggle="modal" data-dismiss="modal" data-target="#signinModal">Local</a></p>
 
 
       </div>
@@ -536,7 +584,7 @@ Login
   }
 
   .rform{
-      background-color: rgba(0,0,0,.5);
+      background-color: rgba(250,250,250,.5);
       padding: 20px;
       border-radius: 5px;
   }
@@ -569,7 +617,7 @@ Login
 </style>
 
 
-<section id="register">
+<section id="register" class="reg">
 
 <div class="container">
     <div class="row">
@@ -577,20 +625,99 @@ Login
         <div class="col-md-8">
         
 
-        <form class="rform" >
+        <?php
+         if(isset($_POST["register_btn"])){
+
+        $username = $_POST['name'];
+          $useremail = $_POST['email'];
+          $userpassword = $_POST['password'];
+          $userphone = $_POST['phone'];
+          $usercnic = $_POST['cnic'];
+
+          $pname = $_FILES["picture"]["name"];                           
+         $basename = pathinfo($pname)['filename'];      
+         $basename = $basename.rand();
+          $itemp_name = $_FILES["picture"]["tmp_name"];
+
+        
+
+       $extension = strtolower(pathinfo($pname,PATHINFO_EXTENSION));
+
+
+          
+
+          $check1 = "select email from visitors WHERE email = '$useremail' ";
+              $data1 = mysqli_query($conn,$check1);
+              $check2 = "select cnic from visitors WHERE cnic = '$usercnic' ";
+              $data2 = mysqli_query($conn,$check2);
+              if(mysqli_num_rows($data1)>0){
+              
+
+            ?>
+<script type="text/javascript">
+          
+          // alert("Sorry you entered email already taken!");
+          document.getElementById("carousel").style.display = "none";
+          document.getElementById("about").style.display = "none";
+          document.getElementById("register").style.display = "block";
+</script>
+<div class="alert alert-warning">
+  <strong>Sorry!</strong> <?php echo $_POST['email']; ?> are already taken.
+</div>
+
+            <?php
+            }
+            else if(mysqli_num_rows($data2)>0){
+
+              ?>
+              <script type="text/javascript">
+                        
+                        alert("Sorry you entered cnic already taken!");
+              </script>
+              <div class="alert alert-warning">
+                <strong>Sorry!</strong> <?php echo $_POST['cnic']; ?> are already taken.
+              </div>
+              
+    <?php
+            }
+            else{
+                $basename = $basename.'.'.$extension;
+              if(move_uploaded_file($itemp_name,"assets/images/$basename")){
+                $q = "insert into visitors(name,email,password,phone,cnic,picture) 
+                values('$username','$useremail','$userpassword','$userphone', '$usercnic','$basename')";
+                if( mysqli_query($conn,$q)){
+                ?>
+                <script>
+              alert("Successfully! registered");
+                </script>
+                <?php
+                }
+                
+              }
+              }
+            }
+          
+         
+        
+        
+        ?>
+
+        <form class="rform" id="myform" method="post" action="home.php" enctype="multipart/form-data">
   
         <div class="input-group mb-3">
 <div class="input-group-prepend">
 <span class="input-group-text" id="basic-addon1"><i class="fas fa-user"></i></span>
 </div>
-<input type="text" class="form-control" placeholder="Full Name" aria-describedby="basic-addon1">
+<input type="text" name="name" class="form-control" placeholder="Full Name"
+ value="<?php if(isset($_POST['name'])){echo $_POST['name'];} ?>" aria-describedby="basic-addon1" required>
 </div>
   
   <div class="input-group mb-3">
 <div class="input-group-prepend">
 <span class="input-group-text" id="basic-addon2"><i class="fas fa-at"></i></span>
 </div>
-<input type="email" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="basic-addon2">
+<input type="email" class="form-control" name="email" placeholder="Email" value="<?php if(isset($_POST['email'])){echo $_POST['email'];} ?>"
+ aria-label="Email" aria-describedby="basic-addon2" required>
 </div>
 
 
@@ -598,11 +725,12 @@ Login
 <div class="input-group-prepend">
 <span class="input-group-text" id="basic-addon3"><i class="fas fa-unlock"></i></span>
 </div>
-<input type="password" class="form-control" id="mypass2" placeholder="Password" aria-label="Username" aria-describedby="basic-addon3">
+<input type="password" class="form-control" name="password" value="<?php if(isset($_POST['password'])){echo $_POST['password'];} ?>"
+id="mypass2" placeholder="Password" aria-label="Username" aria-describedby="basic-addon3" required>
 </div>
 
 <div class="form-check">
-    <input type="checkbox" onclick="myPassword()"  class="form-check-input" id="exampleCheck2">
+    <input type="checkbox" onclick="myPassword()"  class="form-check-input" id="exampleCheck2" >
     <label class="form-check-label" for="exampleCheck2">Show Password</label>
   </div>
 
@@ -612,7 +740,8 @@ Login
 <div class="input-group-prepend">
 <span class="input-group-text" id="basic-addon4"><i class="fas fa-phone"></i></span>
 </div>
-<input type="number" class="form-control"  placeholder="Phone (0344-377373733)" aria-label="Username" aria-describedby="basic-addon4">
+<input type="number" class="form-control" name="phone" placeholder="Phone (0344-377373733)" value="<?php if(isset($_POST['phone'])){echo $_POST['phone'];} ?>"
+aria-label="Username" aria-describedby="basic-addon4" required>
 </div>
 
 
@@ -620,7 +749,8 @@ Login
 <div class="input-group-prepend">
 <span class="input-group-text" id="basic-addon5"><i class="far fa-credit-card"></i></span>
 </div>
-<input type="number" class="form-control"  placeholder="CNIC" aria-label="Username" aria-describedby="basic-addon5">
+<input type="number" class="form-control" name="cnic" placeholder="CNIC" value="<?php if(isset($_POST['cnic'])){echo $_POST['cnic'];} ?>"
+aria-label="Username" aria-describedby="basic-addon5" required>
 </div>
 
 
@@ -628,13 +758,13 @@ Login
 <div class="input-group mb-3 pictureBorder">
 
 <label for="picture" id="spicture"> <i class="fas fa-image"></i> Select Picture</label>
-<input type="file" id="picture" accept="image/*" onchange="loadFile(event)">
+<input type="file" name="picture" id="picture" accept="image/*" onchange="loadFile(event)" required>
 <img id="output"/>
 </div>
 
 <div class="input-group">
   
-    <input type="button" class="btn btn-primary form-control" value="Register">
+    <input type="submit" name="register_btn" id="form-button-submit" class="btn btn-primary form-control" value="Register">
     
 </div>
 
@@ -645,6 +775,12 @@ Login
 </div>
 
 </section>
+
+<script>
+// if ( window.history.replaceState ) {
+//   window.history.replaceState( null, null, window.location.href );
+// }
+</script>
 
 
 <!-- registration end -->
@@ -716,8 +852,10 @@ function myFunction1() {
 </script>
 
 <script src="assets/js/jquery.slim.min.js"></script>
+<script src="assets/js/jquery.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
+
 
 </body>
 </html>
