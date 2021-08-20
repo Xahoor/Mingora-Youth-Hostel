@@ -1,3 +1,19 @@
+<?php
+	session_start();
+	if(!isset($_SESSION["user_email"]) || !isset($_SESSION["user_password"])){
+		header("location: ../home.php");
+	}
+	require '../connection.php';
+
+    $userid = $_SESSION["user_id"];
+
+
+    $user_data = mysqli_query($conn,"select * from visitors where id = '$userid' ");
+
+    $data = mysqli_fetch_array($user_data);
+    
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,10 +130,17 @@ nav li .texts{
     <ul class="navbar-nav">
 
     <li class="nav-item">
-        <a class="nav-link image " href="profile.php" role="button" >
-        
-          <img src="../assets/images/obaid.jpg" alt="image"><span class="named">Obaid</span>
-          
+    <a class="nav-link image" href="profile.php" role="button" >
+          <?php
+          if($data['picture'] == ''){ 
+          ?>
+          <img src="../assets/images/students.jpg" alt="image"><span class="named"> 
+          <?php } else{?>
+          <img src="../assets/images/<?php echo $data['picture']; ?>" alt="image">
+
+            <?php } ?>
+          <span class="named"><?php $un = $data["name"]; 
+                    echo strtok($un, " "); ?></span>
         </a>
     </li>
 
@@ -145,10 +168,25 @@ nav li .texts{
   </div>
 </nav>
 
+<?php
+
+               $check_room=  mysqli_query($conn,"select * from allotte_room where id ='$userid'");
+              if(mysqli_num_rows($check_room)>0){
+               $roomdata =  mysqli_fetch_array($check_room);
+               $allotid = $roomdata["rid"];
+
+              $roomid =  mysqli_fetch_array(mysqli_query($conn,"select * from allotte_room where rid= '$allotid'"))["rid"];
+
+             $realdata =  mysqli_fetch_array(mysqli_query($conn,"select * from rooms where rid ='$roomid'"))["room_no"];
+
+
+              
+?>
 
 <section id="roomInformation">
 
     <div class="container">
+   
         <div class="row content">
 
         <div class="col-xs-6 col-sm-6 col-md-6 col-lg-3">
@@ -156,7 +194,9 @@ nav li .texts{
                               <a href="">
                                 <div class="panel-body">
                                     <div class="statistic-box">
-                                        <h2><span class="count-number">15</span>
+                                        <h2><span class="count-number"><?php echo $realdata;
+
+                                        ?></span>
                                         </h2>
                                     </div>
                                     <div class="items pull-left">
@@ -184,16 +224,24 @@ nav li .texts{
     <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
   </ol>
   <div class="carousel-inner">
-    <div class="carousel-item active dark-overlay">
-      <img src="../assets/images/room.jpg" class="img-fluid tales" alt="...">
-     
-        
+
+  <?php
+
+$getpics= mysqli_query($conn,"select * from room_pictures where rid='$roomid'");
+$c =1;
+ while($pics = mysqli_fetch_array($getpics)){
+ ?>
+
+    <div class="carousel-item <?php if($c<=1){ echo 'active';} ?>">
+      <img src="../assets/images/<?php echo $pics['picture'];?>" class="img-fluid tales" alt="...">
     </div>
-    <div class="carousel-item">
-      <img src="../assets/images/washroom.jpg" class="d-block w-100 tales" alt="...">
-      
-    </div>
-   
+
+  <?php
+  $c++;
+ }
+  ?>
+
+    
   <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
     <span class="sr-only">Previous</span>
@@ -206,15 +254,19 @@ nav li .texts{
 
 
 </section>
-
-
-
         </div>
 
         </div>
     </div>
 
 </section>
+<?php
+
+            }
+?>
+
+
+
 
 
 <section>
@@ -225,7 +277,24 @@ nav li .texts{
 
 
 
+<script>
 
+  function sweet(){
+
+    Swal.fire({
+  title: 'Do you want to logout?',
+  showDenyButton: true,
+  confirmButtonText: `Yes`
+}).then((result) => {
+  /* Read more about isConfirmed, isDenied below */
+  if (result.isConfirmed) {
+    window.location = "signout.php";
+    
+  } 
+})
+
+  }
+</script>
 
 
 <script src="../assets/js/sweetalert.js"></script>

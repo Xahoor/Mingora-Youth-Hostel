@@ -1,3 +1,11 @@
+<?php
+	session_start();
+	if(!isset($_SESSION["email"]) || !isset($_SESSION["password"])){
+		header("location: ../home.php");
+	}
+	require '../connection.php';
+
+  ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -146,49 +154,48 @@ nav li a.nav-link{
 
      
           <div class="col-md-10">
-          <button  onclick="guests()"> <i class="fas fa-suitcase-rolling"></i> Guest</button>
-         <button  onclick="registered()"> <i class="fas fa-registered"></i></i> Registered</button>
+          <button  onclick="guests()"> <i class="fas fa-suitcase-rolling"></i> Guest and</button>
+         <button  onclick=""> <i class="fas fa-registered"></i></i> Registered</button>
          
          <section id="guests"><table class="table table-bordered">
   <thead>
     <tr>
       <th scope="col">No</th>
       <th scope="col">Name</th>
-      <th scope="col">Room No</th>
-      <th scope="col">Bed No</th>
-      <th scope="col">In date</th>
-      <th scope="col">Contact No</th>
+      <th scope="col">Email</th>
       <th scope="col">CNIC</th>
+      <th scope="col">Phone</th>
+     
       
     </tr>
   </thead>
   <tbody>
+    <?php
+
+  $data =mysqli_query($conn,"select * from visitors");
+  $no=1;
+  while($row= mysqli_fetch_array($data)){
+    ?>
+
     <tr>
-      <th scope="row">1</th>
-      <td>Khan </td>
-      <td>4</td>
-      <td>NA</td>
-      <td>24/jan/2021</td>
-      <td>0348732838932</td>
-      <td>15607623782387872</td>
-      
+      <td><?php echo $no; ?></td>
+      <td><?php echo $row["name"]; ?> </td>
+      <td><?php echo $row["email"]; ?> </td>
+      <td><?php echo $row["cnic"]; ?> </td>
+      <td><?php echo $row["phone"]; ?></td>
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Ali </td>
-      <td>7</td>
-      <td>2</td>
-      <td>07/feb/2021</td>
-      <td>0348732838932</td>
-      <td>15607623782387872</td>
-      
-    </tr>
+
+    <?php
+    $no++;
+}
+    ?>
+    
    
   </tbody>
 </table></section>
 
 
-<section id="registered"><table class="table table-bordered">
+<!-- <section id="registered"><table class="table table-bordered">
   <thead>
     <tr>
       <th scope="col">No</th>
@@ -219,7 +226,7 @@ nav li a.nav-link{
     </tr>
    
   </tbody>
-</table></section>
+</table></section> -->
 
 
 
@@ -245,7 +252,7 @@ confirmButtonText: `Yes`
 }).then((result) => {
 /* Read more about isConfirmed, isDenied below */
 if (result.isConfirmed) {
-  window.location = "../home.php";
+  window.location = "signout.php";
   
 } 
 })

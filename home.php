@@ -384,9 +384,12 @@ nav .active a{
     $useremail = $_POST['login_email'];
     $userpassword = $_POST['login_password'];
 
-    $check_user = "select * from visitors WHERE email = '$useremail' and password = '$userpassword'";
+    $check_user = "select * from visitors WHERE email='$useremail' and password='$userpassword'";
     $login = mysqli_query($conn,$check_user);
     if(mysqli_num_rows($login)>0){
+      $_SESSION['user_id'] = mysqli_fetch_array($login)["id"];
+      $_SESSION['user_email'] = $useremail;
+      $_SESSION['user_password'] = $userpassword;
        header("location: visitor/dashboard.php"); 
     }
     else{
@@ -449,7 +452,7 @@ nav .active a{
 
 <div class="input-group">
 
-<input type="submit" name="login_btn" class="btn btn-primary form-control" href="buyAnsSale/dashbaord.php" value="Login">
+<input type="submit" name="login_btn" class="btn btn-primary form-control" value="Login">
 
 </div>
 
@@ -498,21 +501,37 @@ nav .active a{
       <div class="modal-body">
         
 
-      <form class="form" >
+      <?php
+
+          if(isset($_POST["admin_login"])){
+              $email =$_POST["admin_email"];
+              $password =$_POST["admin_password"];
+
+              $check =mysqli_query($conn,"select * from admin where email='$email' and password='$password'");
+              if(mysqli_num_rows($check)>0){
+                $_SESSION["email"] = $email;
+                $_SESSION["password"] = $password;
+                header("location: admin/dashboard.php");
+              }
+
+          }
+
+?>
+      <form class="form" action="home.php" method="post">
   
   
   <div class="input-group mb-3">
 <div class="input-group-prepend">
 <span class="input-group-text" id="basic-addon1"><i class="fas fa-at"></i></span>
 </div>
-<input type="email" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="basic-addon1">
+<input type="email" name="admin_email" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="basic-addon1">
 </div>
 
 <div class="input-group mb-3">
 <div class="input-group-prepend">
 <span class="input-group-text" id="basic-addon1"><i class="fas fa-unlock"></i></span>
 </div>
-<input type="password" class="form-control" id="mypass" placeholder="Password" aria-label="Username" aria-describedby="basic-addon1">
+<input type="password" name="admin_password" class="form-control" id="mypass" placeholder="Password" aria-label="Username" aria-describedby="basic-addon1">
 </div>
 
 
@@ -524,10 +543,10 @@ nav .active a{
 
 
 <div class="input-group">
-<a href="admin/dashboard.php" target="_blank"  id="loogin1">
-<!-- <input type="submit" class="btn btn-primary form-control" href="buyAnsSale/dashbaord.php" value="Login"> -->
-Login
-</a>
+<!-- <a href="admin/dashboard.php" target="_blank"  id="loogin1"> -->
+<input type="submit" name="admin_login" class="btn btn-primary form-control"  value="Login">
+<!-- Login -->
+<!-- </a> -->
 </div>
 
 

@@ -1,3 +1,19 @@
+<?php
+	session_start();
+	if(!isset($_SESSION["user_email"]) || !isset($_SESSION["user_password"])){
+		header("location: ../home.php");
+	}
+	require '../connection.php';
+ob_start();
+    $userid = $_SESSION["user_id"];
+
+
+    $user_data = mysqli_query($conn,"select * from visitors where id = '$userid' ");
+
+    $data = mysqli_fetch_array($user_data);
+    
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,10 +166,17 @@ nav li .texts{
     <ul class="navbar-nav">
 
     <li class="nav-item">
-        <a class="nav-link image active" href="profile.php" role="button" >
-        
-          <img src="../assets/images/obaid.jpg" alt="image"><span class="named">Obaid</span>
-          
+    <a class="nav-link image" href="profile.php" role="button" >
+          <?php
+          if($data['picture'] == ''){ 
+          ?>
+          <img src="../assets/images/students.jpg" alt="image"><span class="named"> 
+          <?php } else{?>
+          <img src="../assets/images/<?php echo $data['picture']; ?>" alt="image">
+
+            <?php } ?>
+          <span class="named"><?php $un = $data["name"]; 
+                    echo strtok($un, " "); ?></span>
         </a>
     </li>
 
@@ -203,23 +226,96 @@ nav li .texts{
 </div>
 
 <section id="image">
+<?php
+
+if(isset($_POST["upload"])){
+  
+  $pname = $_FILES["picture"]["name"];
+           
+  $basename = pathinfo($pname)['filename'];
+ $basename = $basename.rand();   
+  $itemp_name = $_FILES["picture"]["tmp_name"];
+$extension = strtolower(pathinfo($pname,PATHINFO_EXTENSION));
+
+$check = "select * from visitors where id = '$userid'";
+$data_select = mysqli_query($conn,$check);
+$fetched_image = mysqli_fetch_array($data_select);
+  $image = $fetched_image['picture'];
+
+  if(empty($image)){
+
+    $basename = $basename.".".$extension;
+    if(move_uploaded_file($itemp_name,"../assets/images/$basename")){
+        $upload = "update visitors set picture = '$basename' where id = '$userid' ";
+        if(mysqli_query($conn,$upload)){
+            header("refresh: 0");
+        }
+        }
+      }
+      else{
+        if(unlink("../assets/images/$image")){
+          $basename = $basename.".".$extension;
+          if(move_uploaded_file($itemp_name,"../assets/images/$basename")){
+              $q_update = "update visitors set picture = '$basename' where id = '$userid'";
+                  if(mysqli_query($conn,$q_update)){
+                    header("refresh: 0");
+                  }
+                      
+          }
+        }
+      }
+
+}
+
+?>
     <div class="container">
     <div class="row">
 
         <div class="col-md-2"></div>
         
+
        
             <div class="col-md-4 profileImage">
                 
-            <img src="../assets/images/obaid.jpg" id="output1" alt="">
-            
-                <label for="cimage"> <i class="fa fa-camera"></i></label>
-                <input type="file" id="cimage" accept="image/*" onchange="loadFile(event)">          
-                
-                <input type="submit" value="Save picture" id="savePic">
            
-            </div>
+<!-- 
+            <form  action="profile.php" method="post" enctype="multipart/form-data">
+            <img src="../assets/images/placeholder.png" id="output1" alt="">
+            <div class="form-group">
+                <label for="cimage"> <i class="fa fa-camera"></i></label>
+                <input type="file" name="picture" class="form-control" id="cimage" accept="image/*" onchange="loadFile(event)" required>         
+                
+                </div>
+               
+                <div class="form-group">
+                <input type="submit" class="form-control" name="upload" value="Save picture" id="savePic">
+                </div>
+                
+                </form> -->
 
+                <form action="profile.php" method="post" enctype="multipart/form-data">
+                    <div class="filled" id='profile-upload'>
+                        
+
+                        <div class="form-group">
+                        <?php 
+         $data= mysqli_fetch_array(mysqli_query($conn,"select * from visitors where id='$userid'"));
+          if($data['picture']== ''){ 
+          ?>
+                        <img class="hvr-profile-img" id="output1" src="../assets/images/placeholder.png">
+                        <input type="file" name="picture" id='getval' accept="image/*" onchange="loadFile(event)"  class="upload w180" title="Dimensions 180 X 180" id="imag" required>
+                        <?php } else{?>
+                            <img class="hvr-profile-img" id="output1" src="../assets/images/<?php echo $data['picture'];?>">
+                            <input type="file" name="picture" id='getval' accept="image/*" onchange="loadFile(event)" class="upload w180" title="Dimensions 180 X 180" id="imag" required>
+                      
+                            <?php } ?>
+                        
+                        
+
+                        </div>           
+            </div>
+<input type="submit" name="upload"  value="Save Picture">
+                        </form>
             
             
 
@@ -239,18 +335,60 @@ nav li .texts{
         
        
             <div class="col-md-8 profilePrivacy">
+              <?php
+
+
+                            if(isset($_POST["email_password"])){
+                             $email= $_POST["email"];
+                             $password= $_POST["password"];
+
+                             $check = mysqli_query($conn,"select * from visitors where email='$email'");
+                             if(mysqli_num_rows($check)>0){
+                               ?>
+
+                              <script>
+                                alert("Sorry! your entered email already exist");
+                              </script>
+<?php
+                             }
+                             else{
+                               if(mysqli_query($conn,"update visitors set email='$email', password='$password' where id='$userid'")){
+                                 $_SESSION["user_email"] =$email;
+                                 $_SESSION["user_password"] =$password;
+                                 ?>
+
+                                 <script>
+                                   alert("Change successfully!");
+                                 </script>
+   <?php
+                  header("refresh:2");
+
+                               }
+                             }
+
+                            }
+              ?>
+
+
+
+
                 
-                <form action="">
+                <form action="profile.php" method="post">
 
 
+                <?php
+
+      $d =mysqli_fetch_array(mysqli_query($conn,"select * from visitors where id='$userid'"));
+
+?>
                     <div class="form-group">
                     <label for="">Email</label>
-                    <input type="email" class="form-control" value="obaid123@gmail.com">
+                    <input type="email" name="email" class="form-control" value="<?php echo $d["email"]; ?>">
                     </div>
                     
                     <div class="form-group">
                     <label for="">Password</label>
-                    <input type="password" id="mypass" class="form-control" value="1234">
+                    <input type="password" id="mypass" name="password" class="form-control" value="">
                     </div>
 
                     <div class="form-check">
@@ -258,7 +396,7 @@ nav li .texts{
                     <label class="form-check-label" for="exampleCheck1">Show Password</label>
                     </div>
 
-                    <input type="submit" value="Save" id="savePrivacy">
+                    <input type="submit" name="email_password" value="Save" id="savePrivacy">
 
                 </form>
            
@@ -285,30 +423,55 @@ nav li .texts{
        
             <div class="col-md-8 profileGeneral">
                 
-                <form action="">
+            <?php
 
+
+if(isset($_POST["general"])){
+ $name= $_POST["fname"];
+ $age= $_POST["age"];
+ $contact= $_POST["contact"];
+
+
+
+   if(mysqli_query($conn,"update visitors set name='$name', phone='$contact', age='$age' where id='$userid'")){
+
+     ?>
+
+     <script>
+       alert("Change successfully!");
+     </script>
+<?php
+header("refresh:2");
+
+   }
+ }
+
+
+?>
+
+
+                <form action="profile.php" method="post">
+<?php
+     $g = mysqli_fetch_array(mysqli_query($conn,"select * from visitors where id='$userid'"));
+?>
 
                     <div class="form-group">
                     <label for="">Full Name</label>
-                    <input type="text" class="form-control" value="Obaid Khan">
+                    <input type="text" name="fname" class="form-control" value="<?php echo $g["name"];?>">
                     </div>
                     
                     <div class="form-group">
                     <label for="">Age</label>
-                    <input type="number" class="form-control" value="22">
+                    <input type="number" name="age" class="form-control" value="">
                     </div>
 
                     <div class="form-group">
                     <label for="">Contact</label>
-                    <input type="number" class="form-control" value="03349324243">
+                    <input type="number" name="contact" class="form-control" value="<?php echo $g["phone"]; ?>">
                     </div>
 
-                    <div class="form-group">
-                    <label for="">CNIC</label>
-                    <input type="number" class="form-control" value="156024568839332">
-                    </div>
-
-                    <input type="submit" value="Save" id="saveGeneral">
+                    
+                    <input type="submit" name="general" value="Save" id="saveGeneral">
 
                 </form>
            

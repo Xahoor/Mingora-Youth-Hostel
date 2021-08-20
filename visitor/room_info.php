@@ -1,3 +1,26 @@
+<?php
+	session_start();
+	if(!isset($_SESSION["user_email"]) || !isset($_SESSION["user_password"])){
+		header("location: ../home.php");
+	}
+	require '../connection.php';
+
+    $userid = $_SESSION["user_id"];
+
+
+    $user_data = mysqli_query($conn,"select * from visitors where id = '$userid' ");
+
+    $data = mysqli_fetch_array($user_data);
+
+  $room_id="";
+   if(isset($_GET["room_id"])){
+      $room_id = $_GET["room_id"];
+   }
+   else{
+     header("location: dashboard.php");
+   }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,8 +89,17 @@ nav li .texts{
     <ul class="navbar-nav">
 
     <li class="nav-item">
-        <a class="nav-link image" href="profile.php" role="button" >
-          <img src="../assets/images/obaid.jpg" alt="image"><span class="named">Obaid</span>
+    <a class="nav-link image" href="profile.php" role="button" >
+          <?php
+          if($data['picture'] == ''){ 
+          ?>
+          <img src="../assets/images/students.jpg" alt="image"><span class="named"> 
+          <?php } else{?>
+          <img src="../assets/images/<?php echo $data['picture']; ?>" alt="image">
+
+            <?php } ?>
+          <span class="named"><?php $un = $data["name"]; 
+                    echo strtok($un, " "); ?></span>
         </a>
     </li>
 
@@ -158,34 +190,34 @@ nav li .texts{
   
   <tbody>
 
+  <?php
+    $roominfo= mysqli_fetch_array(mysqli_query($conn,"select * from rooms where rid = '$room_id'"));
+  ?>
      <tr>
       <th scope="row">Room No</th>
-      <td>3</td>     
+      <td><?php echo $roominfo["room_no"]; ?></td>     
     </tr>
     <tr>
       <th scope="row">Type</th>
-      <td>Single</td>     
+      <td><?php echo $roominfo["room_type"]; ?></td>     
     </tr>
     <tr>
       <th scope="row">Beds</th>
-      <td>1</td>     
+      <td><?php echo $roominfo["total_bed"]; ?></td>     
     </tr>
     <tr>
       <th scope="row">Fan</th>
-      <td>No</td>     
+      <td><?php echo $roominfo["fan"]; ?></td>     
     </tr>
     <tr>
       <th scope="row">Room Heater</th>
-      <td>Yes</td>     
+      <td><?php echo $roominfo["heater"]; ?></td>     
     </tr>
     <tr>
       <th scope="row">Ac</th>
-      <td>Yes</td>     
+      <td><?php echo $roominfo["ac"]; ?></td>     
     </tr>
-    <tr>
-      <th scope="row">Washroom</th>
-      <td>Yes</td>     
-    </tr>
+
 
 
     
@@ -236,57 +268,23 @@ nav li .texts{
                     
 <h3>Room Pictures</h3>
 
-<div class="responsive">
-<div class="gallery">
-  <a target="_blank" href="../assets/images/room.jpg">
-    <img src="../assets/images/room.jpg"  width="600" >
-  </a>
-</div>
-</div>
+<?php
+      $allpics = mysqli_fetch_array(mysqli_query($conn,"select * from room_pictures where rid='$room_id'"));
+  
 
+?>
 <div class="responsive">
 <div class="gallery">
-  <a target="_blank" href="../assets/images/washroom.jpg">
-    <img src="../assets/images/washroom.jpg"  width="600" >
+  <a target="_blank" href="../assets/images/<?php $pic["picture"]; ?>">
+    <img src="../assets/images/<?php echo $allpics['picture']; ?>" width="600" >
+   
   </a>
 </div>
 </div>
+<?php
 
-<div class="responsive">
-<div class="gallery">
-  <a target="_blank" href="../assets/images/c1.jpg">
-    <img src="../assets/images/c1.jpg"  width="600" >
-  </a>
-</div>
-</div>
-<div class="responsive">
-<div class="gallery">
-  <a target="_blank" href="../assets/images/c3.jpg">
-    <img src="../assets/images/c3.jpg"  width="600" >
-  </a>
-</div>
-</div>
-<div class="responsive">
-<div class="gallery">
-  <a target="_blank" href="../assets/images/c2.jpg">
-    <img src="../assets/images/c2.jpg"  width="600" >
-  </a>
-</div>
-</div>
-<div class="responsive">
-<div class="gallery">
-  <a target="_blank" href="../assets/images/location.jpg">
-    <img src="../assets/images/location.jpg"  width="600" >
-  </a>
-</div>
-</div>
-<div class="responsive">
-<div class="gallery">
-  <a target="_blank" href="../assets/images/large.png">
-    <img src="../assets/images/large.png"  width="600" >
-  </a>
-</div>
-</div>
+?>
+
 
 
                 </div>
@@ -330,7 +328,7 @@ nav li .texts{
                 </tr>
                 <tr>
                     <th scope="row">Email</th>
-                    <td>online@myh.com</td>
+                    <td>mingora-youth-hostel@gmail.com</td>
                 </tr>
             </tbody>
         </table>

@@ -1,3 +1,11 @@
+<?php
+	session_start();
+	if(!isset($_SESSION["email"]) || !isset($_SESSION["password"])){
+		header("location: ../home.php");
+	}
+	require '../connection.php';
+
+  ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +19,8 @@
 <link rel="stylesheet" type="text/css" href="../assets/fontawsome/css/all.min.css"/>
 
 <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+
+<script src="../assets/js/jquery.js"></script>
 
 
 <style>
@@ -205,29 +215,50 @@ nav li a.nav-link{
       <table class="table table-borderless daily-tbl">
   
   <tbody>
+  
     <tr>
       <th scope="row">Total Rooms</th>
-      <td>20</td>  
+      <td>  <?php
+$q1 = mysqli_query($conn,"select * from rooms");
+echo $rows = mysqli_num_rows($q1);
+?></td>  
     </tr>
     <tr>
       <th scope="row">Reserved Rooms</th>
-      <td>7</td>  
+      <td> <?php
+$q12 = mysqli_query($conn,"select * from allotte_room");
+echo $rows2 = mysqli_num_rows($q12);
+?></td>  
     </tr>
     <tr>
       <th scope="row">Guests</th>
-      <td>7</td>  
+      <td> <?php
+
+echo $rows2;
+?></td>  
     </tr>
     <tr>
       <th scope="row">Registered Users</th>
-      <td>100</td>  
+      <td><?php
+$q13 = mysqli_query($conn,"select * from visitors");
+echo $rows3 = mysqli_num_rows($q13);
+?></td>  
     </tr>
     <tr>
       <th scope="row">Complains</th>
-      <td>10</td>  
+      <td><?php
+$q14 = mysqli_query($conn,"select * from visitor_complains");
+echo $rows4 = mysqli_num_rows($q14);
+?></td>  
     </tr>
     <tr>
       <th scope="row">Announcements</th>
-      <td>9</td>  
+      <td>
+      <?php
+$q15 = mysqli_query($conn,"select * from annoncements");
+echo $rows5 = mysqli_num_rows($q15);
+?>
+      </td>  
     </tr>
  
 </tbody>
@@ -238,15 +269,38 @@ nav li a.nav-link{
          <button  onclick="complains()"> <i class="fas fa-mail-bulk"></i></i> Complains</button>
 
         <section id="announce">
-            
-            <form action="">
+        
+        <?php
+
+      if(isset($_POST["ann"])){
+        $desc = $_POST["des"];
+        $date = date("y/m/d");
+        if(mysqli_query($conn,"insert into annoncements(description,date) value('$desc','$date')")){
+          ?>
+<script>
+  alert("Announcement Sended");
+</script>
+          <?php
+        }
+        else{
+          ?>
+          <script>
+            alert("failed");
+          </script>
+                    <?php
+        }
+      }
+
+?>
+
+            <form action="dashboard.php" method="post">
             <div class="form-group">
   <label for="exampleFormControlTextarea1"> Write Below </label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="5"></textarea>
+    <textarea class="form-control" name="des" id="exampleFormControlTextarea1" rows="5"></textarea>
   </div>
 
   <div class="form-group announce-btn">
-  <input type="submit" value="Announce">
+  <input type="submit" name="ann" value="Announce">
   </div>
 
 
@@ -262,23 +316,23 @@ nav li a.nav-link{
   
   <tbody>
 
-    
+    <?php
+
+$complain = mysqli_query($conn,"select * from visitor_complains");
+while($com = mysqli_fetch_array($complain)){
+$id = $com["id"];
+         $name= mysqli_fetch_array(mysqli_query($conn,"select * from visitors where id='$id'"))["name"];
+    ?>
     <tr>
-      <th scope="row">Name</th>
-      <th scope="row">Subject</th>
-      <td>complain complain complain complain complain complain complain complain complain complain complain complaincomplain complain complain 
-      complain complain complaincomplain complain complaincomplain complain complaincomplain complain complaincomplain complain complain
-      complain complain complaincomplain complain complaincomplain complain complaincomplain complain complain</td>  
+      <th scope="row"><?php echo $name; ?></th>
+      <th scope="row"><?php echo $com["subject"]; ?></th>
+      <td><?php echo $com["complain"]; ?></td>  
     </tr>
     
-      
-    <tr>
-      <th scope="row">Name</th>
-      <th scope="row">Subject</th>
-      <td>complain complain complain complain complain complain complain complain complain complain complain complaincomplain complain complain 
-      complain complain complaincomplain complain complaincomplain complain complaincomplain complain complaincomplain complain complain
-      complain complain complaincomplain complain complaincomplain complain complaincomplain complain complain</td>  
-    </tr>
+      <?php
+}
+      ?>
+  
  
 </tbody>
 </table>
@@ -314,7 +368,7 @@ nav li a.nav-link{
 }).then((result) => {
   /* Read more about isConfirmed, isDenied below */
   if (result.isConfirmed) {
-    window.location = "../home.php";
+    window.location = "signout.php";
     
   } 
 })
@@ -337,6 +391,13 @@ function announce() {
          document.getElementById("complains").style.display = "block";
          
        }
+</script>
+
+<!-- this code will stope resubmission of data after refreshing page -->
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
 </script>
 
 <script src="../assets/js/sweetalert.js"></script>

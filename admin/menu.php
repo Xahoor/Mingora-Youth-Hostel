@@ -1,3 +1,11 @@
+<?php
+	session_start();
+	if(!isset($_SESSION["email"]) || !isset($_SESSION["password"])){
+		header("location: ../home.php");
+	}
+	require '../connection.php';
+ob_start();
+  ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +19,7 @@
 <link rel="stylesheet" type="text/css" href="../assets/fontawsome/css/all.min.css"/>
 
 <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+<script src="../assets/js/jquery.js"></script>
 
 
 <style>
@@ -162,51 +171,27 @@ nav li a.nav-link{
   </thead>
   <tbody>
 
+  <?php
+
+   $all= mysqli_query($conn,"select * from menu");
+    while($m = mysqli_fetch_array($all)){
+
+?>
+    
     <tr>
-      <th scope="row">Sunday</th>
-      <td>Egg+Paratha+Tea</td>  
-      <td>pullao</td>
-      <td>Dal</td>
+      <th scope="row"><?php echo $m["day"]; ?></th>
+      <td><?php echo $m["brakfast"]; ?></td>  
+      <td><?php echo $m["lunch"]; ?></td>
+      <td><?php echo $m["dinner"]; ?></td>
     
     </tr>
-    <tr>
-      <th scope="row">Monday</th>
-      <td>Eggy Bread + Tea</td>  
-      <td>chicken soup</td>
-      <td>Beans soup</td>
-    </tr>
-    <tr>
-      <th scope="row">Tuesday</th>
-      <td>Egg+Paratha+Tea</td>  
-      <td>Beef curry</td>
-      <td>Biryani</td>
-    </tr>
-    <tr>
-      <th scope="row">Wednesday</th>
-      <td>Egg+Paratha+Tea</td>   
-      <td>fish fry</td>
-      <td>chicken fry</td>
-    </tr>
-    <tr>
-      <th scope="row">Thursday</th>
-      <td>Egg+Paratha+Tea</td>  
-      <td>Paya</td>
-      <td>Haleem</td>
-    </tr>
-    <tr>
-      <th scope="row">Friday</th>
-      <td>Egg+Paratha+Tea</td>  
-      <td>Nihari</td>
-      <td>chicken bbq</td>
-      
-    </tr>
-    <tr>
-      <th scope="row">Saturday</th>
-      <td>Egg+Paratha+Tea</td>   
-      <td>Kebabs</td>
-      <td>beef bbq</td>
-    </tr>
-    
+
+    <?php
+
+    }
+?>
+  
+   
 
 
 
@@ -219,9 +204,62 @@ nav li a.nav-link{
 
         <div class="col-md-6">
         <p class="weekly-plan">Update Menu Below</p>
+<?php
+if(isset($_POST["upload_menu"])){
+  $s1b = $_POST["s1b"];
+  $s1l = $_POST["s1l"];
+  $s1d = $_POST["s1d"];
+    $m1b = $_POST["m1b"];
+    $m1l = $_POST["m1l"];
+    $m1d = $_POST["m1d"];
+    $t1b = $_POST["t1b"];
+    $t1l = $_POST["t1l"];
+    $t1d = $_POST["t1d"];
+    $w1b = $_POST["w1b"];
+    $w1l = $_POST["w1l"];
+    $w1d = $_POST["w1d"];
+    $t2b = $_POST["t2b"];
+    $t2l = $_POST["t2l"];
+    $t2d = $_POST["t2d"];
+    $f1b = $_POST["f1b"];
+    $f1l = $_POST["f1l"];
+    $f1d = $_POST["f1d"];
+    $s2b = $_POST["s2b"];
+    $s2l = $_POST["s2l"];
+    $s2d = $_POST["s2d"];
+    $sunday = "sunday";
+    $monday = "monday";
+    $tuesday = "tuesday";
+    $wednesday = "wednesday";
+    $thursday = "thursday";
+    $friday = "friday";
+    $saturday = "saturday";
+
+   
+    $d1 = mysqli_query($conn,"update menu set brakfast='$s1b', lunch='$s1l', dinner='$s1d' where day='$sunday'");
+    $d2 = mysqli_query($conn,"update menu set brakfast='$m1b', lunch='$m1l', dinner='$m1d' where day='$monday'");
+    $d3 = mysqli_query($conn,"update menu set brakfast='$t1b', lunch='$t1l', dinner='$t1d' where day='$tuesday'");
+    $d4 = mysqli_query($conn,"update menu set brakfast='$w1b', lunch='$w1l', dinner='$w1d' where day='$wednesday'");
+    $d5 = mysqli_query($conn,"update menu set brakfast='$t2b', lunch='$t2l', dinner='$t2d' where day='$thursday'");
+    $d6 = mysqli_query($conn,"update menu set brakfast='$f1b', lunch='$f1l', dinner='$f1d' where day='$friday'");
+    $d7 = mysqli_query($conn,"update menu set brakfast='$s2b', lunch='$s2l', dinner='$s2d' where day='$saturday'");
+
+if($d7){
+  header("location: menu.php");
+}
+else{
+  ?>
+<script>
+  alert("failed");
+</script>
+  <?php
+}
 
 
-        <form action="" class="menu-change">
+}
+?>
+
+        <form action="menu.php" method="post" class="menu-change">
         <table class="table table-bordered">
   <thead>
     <tr>
@@ -234,50 +272,53 @@ nav li a.nav-link{
   </thead>
   <tbody>
 
-    
     <tr>
       <th scope="row">Sunday</th>
-      <td> <input type="text" value="Egg+Paratha+Tea"> </td>  
-      <td><input type="text" value="pullao"> </td>
-      <td><input type="text" value="dal"></td>
+      <td> <input type="text" name="s1b" value="Egg+Paratha+Tea"> </td>  
+      <td><input type="text" name="s1l" value="pullao"> </td>
+      <td><input type="text" name="s1d" value="dal"></td>
     
     </tr>
+
+    <?php
+
+    ?>
     <tr>
       <th scope="row">Monday</th>
-      <td><input type="text" value="Eggy Bread + Tea"></td>  
-      <td> <input type="text" value="chicken soup"></td>
-      <td> <input type="text" value="Beans soup"></td>
+      <td><input type="text" name="m1b" value="Eggy Bread + Tea"></td>  
+      <td> <input type="text" name="m1l" value="chicken soup"></td>
+      <td> <input type="text" name="m1d" value="Beans soup"></td>
     </tr>
     <tr>
       <th scope="row">Tuesday</th>
-      <td> <input type="text" value="Egg+Paratha+Tea"></td>  
-      <td> <input type="text" value="Beef curry"></td>
-      <td><input type="text" value="Biryani"></td>
+      <td> <input type="text" name="t1b" value="Egg+Paratha+Tea"></td>  
+      <td> <input type="text" name="t1l" value="Beef curry"></td>
+      <td><input type="text" name="t1d" value="Biryani"></td>
     </tr>
     <tr>
       <th scope="row">Wednesday</th>
-      <td><input type="text" value="Egg+Paratha+Tea"></td>   
-      <td><input type="text" value="fish fry"></td>
-      <td> <input type="text" value="chicken fry"></td>
+      <td><input type="text" name="w1b" value="Egg+Paratha+Tea"></td>   
+      <td><input type="text" name="w1l" value="fish fry"></td>
+      <td> <input type="text" name="w1d" value="chicken fry"></td>
     </tr>
     <tr>
       <th scope="row">Thursday</th>
-      <td><input type="text" value="Egg+Paratha+Tea"></td>  
-      <td><input type="text" value="Paya"></td>
-      <td><input type="text" value="Haleem"></td>
+      <td><input type="text" name="t2b" value="Egg+Paratha+Tea"></td>  
+      <td><input type="text" name="t2l" value="Paya"></td>
+      <td><input type="text" name="t2d" value="Haleem"></td>
     </tr>
     <tr>
       <th scope="row">Friday</th>
-      <td><input type="text" value="Egg+Paratha+Tea"></td>  
-      <td><input type="text" value="Nihari"></td>
-      <td><input type="text" value="chicken bbq"></td>
+      <td><input type="text" name="f1b" value="Egg+Paratha+Tea"></td>  
+      <td><input type="text" name="f1l" value="Nihari"></td>
+      <td><input type="text" name="f1d" value="chicken bbq"></td>
       
     </tr>
     <tr>
       <th scope="row">Saturday</th>
-      <td><input type="text" value="Egg+Paratha+Tea"></td>   
-      <td><input type="text" value="Kebabs"></td>
-      <td><input type="text" value="beef bbq"></td>
+      <td><input type="text" name="s2b" value="Egg+Paratha+Tea"></td>   
+      <td><input type="text" name="s2l" value="Kebabs"></td>
+      <td><input type="text" name="s2d" value="beef bbq"></td>
     </tr>
 
    
@@ -292,7 +333,7 @@ nav li a.nav-link{
 </table>
 
 <div class="form-group menu-btn">
-<input type="submit" value="Change" id="exampleFormControlInput7">
+<input type="submit" name="upload_menu" value="Change" id="exampleFormControlInput7">
 </div>
 
 </form>
@@ -316,14 +357,19 @@ confirmButtonText: `Yes`
 }).then((result) => {
 /* Read more about isConfirmed, isDenied below */
 if (result.isConfirmed) {
-  window.location = "../home.php";
+  window.location = "signout.php";
   
 } 
 })
 
 }
 </script>
-
+<!-- this code will stope resubmission of data after refreshing page -->
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
+</script>
 <script src="../assets/js/sweetalert.js"></script>
 
 <script src="../assets/js/jquery.slim.min.js"></script>

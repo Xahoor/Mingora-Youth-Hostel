@@ -1,3 +1,12 @@
+<?php
+	session_start();
+	if(!isset($_SESSION["email"]) || !isset($_SESSION["password"])){
+		header("location: ../home.php");
+	}
+	require '../connection.php';
+
+  ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +20,7 @@
 <link rel="stylesheet" type="text/css" href="../assets/fontawsome/css/all.min.css"/>
 
 <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+<script src="../assets/js/jquery.js"></script>
 
 <style>
 
@@ -231,37 +241,86 @@ nav li a.nav-link{
          <button onclick="add()"> <i class="fas fa-plus"></i> Add Room</button>
 
         <section id="allot" class="">
-        <form action="">
+          <?php
+
+            if(isset($_POST["allot_room"])){
+              $cnic = $_POST["allot_cnic"];
+              $room = $_POST["allot_roomno"];
+
+             $uid= mysqli_fetch_array(mysqli_query($conn,"select * from visitors where cnic ='$cnic'"))["id"];
+             $rid= mysqli_fetch_array(mysqli_query($conn,"select * from rooms where room_no ='$room'"))["rid"];
+             
+             if(empty($uid)){
+               ?>
+<script>
+  alert("A user does not exist");
+</script>
+               <?php
+             }
+
+             else if(empty($rid)){
+              ?>
+<script>
+ alert("A room does not exist");
+</script>
+              <?php
+            }
+
+             $check1 =mysqli_query($conn,"select * from allotte_room where id='$uid'");
+             $check2 =mysqli_query($conn,"select * from allotte_room where rid='$rid'");
+
+             if(mysqli_num_rows($check1)>0){
+               ?>
+<script>
+  alert("sorry! a user already reserved room");
+</script>
+               <?php
+             }
+
+             else if(mysqli_num_rows($check2)>0){
+              ?>
+              <script>
+                alert("sorry! This room is already reserved");
+              </script>
+                             <?php
+                           }
+
+                           else{
+
+                            $date = date("y/m/d");
+                            $insert = mysqli_query($conn,"insert into allotte_room(id,date,rid) value('$uid','$date','$rid')");
+                            if($insert){
+                              ?>
+<script>
+
+  alert("Success");
+</script>
+
+<?php
+                            }
+                           }
+             }
+
+             
+
+            
+          ?>
+
+        <form action="rooms.php" method="post">
 
         <div class="form-group">
     <label for="exampleFormControlInput1">Guest CNIC</label>
-    <input type="number" class="form-control" id="exampleFormControlInput1">
+    <input type="number" name="allot_cnic" class="form-control" id="exampleFormControlInput1" required>
   </div>
 
 <div class="form-group">
     <label for="exampleFormControlInput5">Room No</label>
-    <input type="number" class="form-control" id="exampleFormControlInput5">
+    <input type="number" name="allot_roomno" class="form-control" id="exampleFormControlInput5" required>
   </div>
-
-  <div class="form-group">
-    <label for="exampleFormControlInput3">Bed No</label>
-    <input type="text" class="form-control" id="exampleFormControlInput3" >
-  </div>
-
-  <div class="form-group">
-    <label for="exampleFormControlInput4">Date </label>
-    <input type="date" class="form-control" id="exampleFormControlInput4" >
-  </div>
-
-  <div class="form-group">
-    <label for="exampleFormControlInput2">Charges</label>
-    <input type="number" class="form-control" id="exampleFormControlInput2">
-  </div>
-
 
   
   <div class="form-group room-btn">
-      <input type="submit" value="Allot">
+      <input type="submit" name="allot_room" value="Allot">
   </div>
 
 </form>
@@ -269,29 +328,47 @@ nav li a.nav-link{
 
 
         <section id="deallot" class="">
+<?php
+
+              if(isset($_POST["get_room"])){
+                $cnic = $_POST["g_cnic"];
+                $room = $_POST["g_room"];
+
+                $uid= mysqli_fetch_array(mysqli_query($conn,"select * from visitors where cnic ='$cnic'"))["id"];
+             $rid= mysqli_fetch_array(mysqli_query($conn,"select * from rooms where room_no ='$room'"))["rid"];
+
+             if(!empty($uid) && !empty($rid)){
+               $q= mysqli_query($conn,"delete from allotte_room where id='$uid' and rid='$rid'");
+               if($q){
+                 ?>
+<script>
+  alert("Room is de allocated");
+</script>
+                 <?php
+               }
+             }
+
+              }
+
+?>
 
 
-        <form action="">
+        <form action="rooms.php" method="post">
 
         <div class="form-group">
     <label for="exampleFormControlInput1">Guest CNIC</label>
-    <input type="number" class="form-control" id="exampleFormControlInput1">
+    <input type="number" name="g_cnic" class="form-control" id="exampleFormControlInput1" required>
   </div>
 
 <div class="form-group">
     <label for="exampleFormControlInput5">Room No</label>
-    <input type="number" class="form-control" id="exampleFormControlInput5">
-  </div>
-
-  <div class="form-group">
-    <label for="exampleFormControlInput3">Bed No</label>
-    <input type="text" class="form-control" id="exampleFormControlInput3" >
+    <input type="number" name="g_room" class="form-control" id="exampleFormControlInput5" required>
   </div>
 
   
 
   <div class="form-group room-btn">
-      <input type="submit" value="Check Out">
+      <input type="submit" name="get_room" value="Check Out">
   </div>
 
 </form>
@@ -305,98 +382,138 @@ nav li a.nav-link{
       <th scope="col">No</th>
       <th scope="col">Name</th>
       <th scope="col">Room No</th>
-      <th scope="col">Bed No</th>
-      <th scope="col">Month</th>
+      <th scope="col">Date</th>
       
     </tr>
   </thead>
+
+  
   <tbody>
+    <?php
+
+            $res = mysqli_query($conn,"select * from allotte_room");
+            $serial=1;
+            while($getr = mysqli_fetch_array($res)){
+                $id = $getr["id"];
+                $date = $getr["date"];
+                $roomid = $getr["rid"];
+
+               $name= mysqli_fetch_array(mysqli_query($conn,"select * from visitors where id='$id'"))["name"];
+               $room_id= mysqli_fetch_array(mysqli_query($conn,"select * from rooms where rid='$roomid'"))["room_no"];
+
+
+            
+    ?>
     <tr>
-      <th scope="row">1</th>
-      <td>Khan</td>
-      <td>3</td>
-      <td>NA</td>
-      <td>Jan</td>
+      <th scope="row"><?php echo $serial; ?></th>
+      <td><?php echo $name; ?></td>
+      <td><?php echo $room_id; ?></td>
+      <td><?php echo $date; ?></td>
       
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Aziz</td>
-      <td>4</td>
-      <td>2</td>
-      <td>Mar</td>
-      
-    </tr>
+
+    <?php
+    $serial++;
+}
+    ?>
+ 
    
   </tbody>
 </table>
         </section>
 
         <section id="add">
+<?php
+
+      if(isset($_POST["add_room"])){
+
+         $no =$_POST["room_no"];
+        $type =$_POST["type"];
+        $beds =$_POST["beds"];
+        $fan =$_POST["fan"];
+        $heater =$_POST["heater"];
+        $ac =$_POST["ac"];
+  
+         $rid = rand(1,999);
+        $pname = $_FILES["picture"]["name"];
+           
+        $basename = pathinfo($pname)['filename'];
+       $basename = $basename.rand();   
+        $itemp_name = $_FILES["picture"]["tmp_name"];
+      $extension = strtolower(pathinfo($pname,PATHINFO_EXTENSION));
+
+      $basename = $basename.".".$extension;
+      if(move_uploaded_file($itemp_name,"../assets/images/$basename")){
+        $insert = "insert into room_pictures(rid,picture) value('$rid','$basename')";
+          if( mysqli_query($conn,$insert)){
+
+          }
+          $upload2 =mysqli_query($conn,"insert into rooms(rid,room_no,total_bed,fan,heater,ac) values('$rid','$no','$beds','$fan','$heater','$ac')");
+          
+          if($upload2){
+            
+          }
 
 
-        <form action="">
+         
+          }
+
+
+
+      }
+
+?>
+
+        <form action="rooms.php" method="post" enctype="multipart/form-data">
 
 
 
 <div class="form-group">
 <label for="exampleFormControlInput7">Room No</label>
-<input type="number" class="form-control" id="exampleFormControlInput7">
+<input type="number" name="room_no" class="form-control" id="exampleFormControlInput7" required>
 </div>
 
 <div class="form-group">
-<label for="exampleFormControlInput6">Type</label>
-<input type="text" class="form-control" id="exampleFormControlInput6" placeholder="Eg: (single, double, and other)">
+<label for="exampleFormControlInput6">Type (optional)</label>
+<input type="text" name="type" class="form-control" id="exampleFormControlInput6" placeholder="Eg: (single, double, and other)" >
 </div>
 
 <div class="form-group">
 <label for="exampleFormControlInput8">Total Beds</label>
-<input type="number" class="form-control" id="exampleFormControlInput8" >
+<input type="number" name="beds" class="form-control" id="exampleFormControlInput8" required>
 </div>
 
 <div class="form-group">
 <label for="exampleFormControlInput9">Fan </label>
-<input type="text" class="form-control" id="exampleFormControlInput9" placeholder="Eg: (Yes or No)">
+<input type="text" name="fan" class="form-control" id="exampleFormControlInput9" placeholder="Eg: (Yes or No)" required>
 </div>
 
 <div class="form-group">
 <label for="exampleFormControlInput10">Room Heater </label>
-<input type="text" class="form-control" id="exampleFormControlInput10" placeholder="Eg: (Yes or No)">
+<input type="text" name="heater" class="form-control" id="exampleFormControlInput10" placeholder="Eg: (Yes or No)" required>
 </div>
 
 <div class="form-group">
 <label for="exampleFormControlInput11">AC </label>
-<input type="text" class="form-control" id="exampleFormControlInput11" placeholder="Eg: (Yes or No)">
-</div>
-
-<div class="form-group">
-<label for="exampleFormControlInput12">Washroom </label>
-<input type="text" class="form-control" id="exampleFormControlInput12" placeholder="Eg: (Yes or No)">
+<input type="text" name="ac" class="form-control" id="exampleFormControlInput11" placeholder="Eg: (Yes or No)" required>
 </div>
 
 
 <div class="form-group groupPhoto">
-                                                <p>Upload Picture (max 4)</p>
+                                                <p>Upload Picture (max 2)</p>
 <div class="form-group">
 
                                                
                                                     <label for="photo1" id="photoLabel1"> 
                                                   <img src="../assets/images/placeholder.png" id="output1" alt=""> <i class="fa fa-camera"></i> </label>
-                                                    <input type="file" id="photo1" accept="image/*" onchange="loadFile(event)">
+                                                    <input type="file" name="picture" id="photo1" accept="image/*" onchange="loadFile(event)"required>
 
                                                                                                       
                                                     <label for="photo2" id="photoLabel2"> 
                                                     <img src="../assets/images/placeholder.png" id="output2" alt="">  <i class="fa fa-camera"></i> </label>
                                                     <input type="file" id="photo2" accept="image/*" onchange="loadFile2(event)">
 
-                                                    <label for="photo2" id="photoLabel3"> 
-                                                    <img src="../assets/images/placeholder.png" id="output3" alt="">  <i class="fa fa-camera"></i> </label>
-                                                    <input type="file" id="photo3" accept="image/*" onchange="loadFile3(event)">
-
-                                                    <label for="photo2" id="photoLabel4"> 
-                                                    <img src="../assets/images/placeholder.png" id="output4" alt="">  <i class="fa fa-camera"></i> </label>
-                                                    <input type="file" id="photo4" accept="image/*" onchange="loadFile4(event)">
-
+                                              
                                                  
                                                     
                                                     
@@ -406,7 +523,7 @@ nav li a.nav-link{
 
 
 <div class="form-group room-btn">
-<input type="submit" value="Add Room">
+<input type="submit"name="add_room" value="Add Room">
 </div>
 
 </form>
@@ -418,7 +535,7 @@ nav li a.nav-link{
 
 
         <div class="col-md-7">
-         <p class="float"> <span class="room-type"> Single Rooms </span></p>
+         <p class="float"> <span class="room-type"> Available Rooms </span></p>
         
         <table class="table table-bordered">
   <thead>
@@ -428,113 +545,45 @@ nav li a.nav-link{
       <th scope="col">Fan</th>
       <th scope="col">Heater</th>
       <th scope="col">Ac</th>
-      <th scope="col">Washroom</th>
 
       
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th scope="row">10</th>
-      <td>1</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
 
+  <?php
+    
+      $rooms = mysqli_query($conn,"select * from rooms");
+$c=1;
+while($r = mysqli_fetch_array($rooms)){
+  $rid = $r["rid"];
+  $rno =$r["room_no"];
+  $b = mysqli_query($conn,"select * from allotte_room where rid='$rid'");
+  if(mysqli_num_rows($b)>0){
+  }
+  else{
+ 
+  ?>
+    <tr>
+      <th scope="row"><?php echo $rno; ?></th>
+      <td><?php echo $r["total_bed"]; ?></td>
+      <td><?php echo $r["fan"];?></td>
+      <td><?php echo $r["heater"];?></td>
+      <td><?php echo $r["ac"];?></td>
+<?php
+ }
+
+}
+?>
       
     </tr>
-    <tr>
-      <th scope="row">12</th>
-      <td>2</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      
-    </tr>
-   
-  </tbody>
-</table>
-
-<p class="float"><span class="room-type">Double Rooms </span></p>
-        
-        <table class="table table-bordered">
-  <thead>
-    <tr>
-      <th scope="col">Room No</th>
-      <th scope="col">Beds </th>
-      <th scope="col">Fan</th>
-      <th scope="col">Heater</th>
-      <th scope="col">Ac</th>
-      <th scope="col">Washroom</th>
-
-      
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">2</th>
-      <td>1</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-
-      
-    </tr>
-    <tr>
-      <th scope="row">6</th>
-      <td>2</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      
+  
     </tr>
    
   </tbody>
 </table>
 
 
-<p class="float"><span class="room-type">Other Rooms </span></p>
-        
-        <table class="table table-bordered">
-  <thead>
-    <tr>
-      <th scope="col">Room No</th>
-      <th scope="col">Beds </th>
-      <th scope="col">Fan</th>
-      <th scope="col">Heater</th>
-      <th scope="col">Ac</th>
-      <th scope="col">Washroom</th>
-
-      
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">3</th>
-      <td>1</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-
-      
-    </tr>
-    <tr>
-      <th scope="row">4</th>
-      <td>2</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      <td>Yes</td>
-      
-    </tr>
-   
-  </tbody>
-</table>
 
         </div>
 
@@ -550,19 +599,26 @@ nav li a.nav-link{
 <script>
 
 
-function previewFile(input){
-        var file = $("input[type=file]").get(0).files[0];
- 
-        if(file){
+var loadFile = function(event) {
+var reader = new FileReader();
+reader.onload = function(){
+var pic1 = document.getElementById('output1');
+pic1.src = reader.result;
+};
+reader.readAsDataURL(event.target.files[0]);
+};
+
+
+
+
+var loadFile2 = function(event) {
             var reader = new FileReader();
- 
             reader.onload = function(){
-                $("#previewImg").attr("src", reader.result);
-            }
- 
-            reader.readAsDataURL(file);
-        }
-    }
+            var pic1 = document.getElementById('output2');
+            pic1.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        };
 
     
   function sweet(){
@@ -574,7 +630,7 @@ function previewFile(input){
 }).then((result) => {
   /* Read more about isConfirmed, isDenied below */
   if (result.isConfirmed) {
-    window.location = "../home.php";
+    window.location = "signout.php";
     
   } 
 })
@@ -609,6 +665,13 @@ function previewFile(input){
           document.getElementById("deallot").style.display = "none";
           document.getElementById("add").style.display = "block";
         }
+</script>
+
+<!-- this code will stope resubmission of data after refreshing page -->
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
 </script>
 
 <script src="../assets/js/sweetalert.js"></script>

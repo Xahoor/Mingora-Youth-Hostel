@@ -1,3 +1,11 @@
+<?php
+	session_start();
+	if(!isset($_SESSION["email"]) || !isset($_SESSION["password"])){
+		header("location: ../home.php");
+	}
+	require '../connection.php';
+
+  ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +19,7 @@
 <link rel="stylesheet" type="text/css" href="../assets/fontawsome/css/all.min.css"/>
 
 <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+<script src="../assets/js/jquery.js"></script>
 
 <style>
 
@@ -178,34 +187,61 @@ nav li a.nav-link{
           <div class="col-md-10">
           <button  onclick="pay()"> <i class="fab fa-cc-amazon-pay"></i> Pay</button>
          <button  onclick="paid()"> <i class="fas fa-money-check-alt"></i> Paid</button>
-         <button  onclick="dues()"> Dues</button>
+         <!-- <button  onclick="dues()"> Dues</button> -->
          <button onclick="create()"> <i class="fas fa-receipt"></i> Create</button>
-         <button onclick="report()"> <i class="fas fa-file-invoice"></i> Report</button>
+         <!-- <button onclick="report()"> <i class="fas fa-file-invoice"></i> Report</button> -->
 
 
          <section id="pay">
 
-         <form action="">
+<?php
 
+      if(isset($_POST["pay_bill"])){
+        echo $cnic = $_POST["pay_cnic"];
+        $month = $_POST["pay_month"];
+        $amount = $_POST["pay_amount"];
+
+        $id = mysqli_fetch_array(mysqli_query($conn,"select * from visitors where cnic='$cnic'"))["id"];
+        $aid = mysqli_fetch_array(mysqli_query($conn,"select * from allotte_room where id='$id'"))["aid"];
+
+      
+        if(mysqli_query($conn,"insert into paid(month,amount,aid) values('$month','$amount','$aid')")){
+          ?>
+<script>
+  alert("Bill Paid");
+</script>
+          <?php
+        }
+        else{
+          ?>
+          <script>
+            alert("failed Paid");
+          </script>
+                    <?php
+        }
+        
+      }
+
+?>
+
+
+         <form action="bills.php" method="post">         
 <div class="form-group">
     <label for="exampleFormControlInput1">CNIC</label>
-    <input type="number" class="form-control" id="exampleFormControlInput1">
+    <input type="number"name="pay_cnic" class="form-control" id="exampleFormControlInput1" required>
   </div>
 
   <div class="form-group">
     <label for="exampleFormControlInput3">Month</label>
-    <input type="text" class="form-control" id="exampleFormControlInput3" placeholder="Eg: jan, feb, mar, and etc">
+    <input type="text" name="pay_month" class="form-control" id="exampleFormControlInput3" placeholder="Eg: jan, feb, mar, and etc" required>
   </div>
 
   <div class="form-group">
     <label for="exampleFormControlInput2">Amount</label>
-    <input type="number" class="form-control" id="exampleFormControlInput2">
-  </div>
-
-
-  
+    <input type="number" name="pay_amount" class="form-control" id="exampleFormControlInput2" required>
+  </div>  
   <div class="form-group bill-btn">
-      <input type="submit" value="Pay">
+      <input type="submit" name="pay_bill" value="Pay">
   </div>
 
 </form>
@@ -214,40 +250,45 @@ nav li a.nav-link{
 
 
          <section id="paid">
-         <table></table>
+        
          
          <table class="table table-bordered">
   <thead>
     <tr>
       <th scope="col">#</th>
-      <th scope="col">Name</th>
       <th scope="col">Room No</th>
       <th scope="col">Amount</th>
       <th scope="col">Month</th>
     </tr>
   </thead>
   <tbody>
+    <?php
+
+$get = mysqli_query($conn,"select * from paid");
+$no=1;
+while($row = mysqli_fetch_array($get)){
+      $aid = $row["aid"];
+     $rid= mysqli_fetch_array(mysqli_query($conn,"select * from allotte_room where aid='$aid'"))["rid"];
+     $rno= mysqli_fetch_array(mysqli_query($conn,"select * from rooms where rid='$rid'"))["room_no"];
+    ?>
     <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-      <td>@mdo</td>
+      <th scope="row"><?php echo $no; ?></th>
+      <td><?php echo $rno; ?></td>
+      <td><?php echo $row["amount"]; ?></td>
+      <td><?php echo $row["month"]; ?></td>
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-      <td>@mdo</td>
-    </tr>
+    <?php
+    $no++;
+
+}
+?>
    
   </tbody>
 </table>
          </section>
 
 
-         <section id="dues"><table class="table table-bordered">
+         <!-- <section id="dues"><table class="table table-bordered">
   <thead>
     <tr>
       <th scope="col">#</th>
@@ -278,55 +319,70 @@ nav li a.nav-link{
    
   </tbody>
 </table>
-         </section>
+         </section> -->
 
          <section id="create">
+           <?php
 
-         <form action="">
+            if(isset($_POST["create_bill"])){
+              $cnic = $_POST["c_cnic"];
+              $month = $_POST["month"];
+              $food = $_POST["food"];
+              $electricity = $_POST["electricity"];
+              $room = $_POST["room"];
+              $services = $_POST["services"];
+              $arrers = $_POST["arrers"];
 
-<div class="form-group">
-    <label for="exampleFormControlInput1">Room No</label>
-    <input type="number" class="form-control" id="exampleFormControlInput1">
-  </div>
+              
+             $id = mysqli_fetch_array(mysqli_query($conn,"select * from visitors where cnic='$cnic'"))["id"];
+             $aid = mysqli_fetch_array(mysqli_query($conn,"select * from allotte_room where id='$id'"))["aid"];
+
+             $create_bill = "insert into bills(aid,month,food,electricity,room_charges,services_tax,arrers) values('$aid','$month','$food','$electricity','$room','$services','$arrers')";
+             if(mysqli_query($conn,$create_bill)){
+               ?>
+<script>
+  alert("bill created");
+</script>
+               <?php
+             }
+             
+            }
+
+?>
+
+         <form action="bills.php" method="post">
+
 
   <div class="form-group">
-    <label for="exampleFormControlInput3">Bed No</label>
-    <input type="text" class="form-control" id="exampleFormControlInput3" >
+    <label for="exampleFormControlInput3">CNIC</label>
+    <input type="number" name="c_cnic" class="form-control" id="exampleFormControlInput3" >
   </div>
-
   <div class="form-group">
     <label for="exampleFormControlInput4">Month </label>
-    <input type="text" class="form-control" id="exampleFormControlInput4" placeholder="Eg: jan, feb, mar, and etc">
+    <input type="text" name="month" class="form-control" id="exampleFormControlInput4" placeholder="Eg: jan, feb, mar, and etc" required>
   </div>
-
   <div class="form-group">
     <label for="exampleFormControlInput5">Food</label>
-    <input type="number" class="form-control" id="exampleFormControlInput5">
+    <input type="number" name="food" class="form-control" id="exampleFormControlInput5">
   </div>
-
   <div class="form-group">
     <label for="exampleFormControlInput6">Electricity</label>
-    <input type="number" class="form-control" id="exampleFormControlInput6">
+    <input type="number" name="electricity" class="form-control" id="exampleFormControlInput6" name="required">
   </div>
-
   <div class="form-group">
     <label for="exampleFormControlInput7">Room</label>
-    <input type="number" class="form-control" id="exampleFormControlInput7">
+    <input type="number" name="room" class="form-control" id="exampleFormControlInput7" required>
   </div>
-
   <div class="form-group">
     <label for="exampleFormControlInput8">Services Tax</label>
-    <input type="number" class="form-control" id="exampleFormControlInput8">
+    <input type="number" name="services" class="form-control" id="exampleFormControlInput8">
   </div>
-
   <div class="form-group">
     <label for="exampleFormControlInput9">Arrers</label>
-    <input type="number" class="form-control" id="exampleFormControlInput9">
+    <input type="number" name="arrers" class="form-control" id="exampleFormControlInput9">
   </div>
-
-    
   <div class="form-group bill-btn">
-      <input type="submit" value="Create">
+      <input type="submit" name="create_bill" value="Create">
   </div>
 
 </form>
@@ -335,58 +391,7 @@ nav li a.nav-link{
 
 
          <section id="report">
-         <table class="table table-bordered">
-  <thead>
-    <tr>
-      <th scope="col">Month</th>
-      <th scope="col">Create</th>
-      <th scope="col">Paid</th>
-      <th scope="col">Dues</th>
-    
-      
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">Jan</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>Otto</td>
-      
-    </tr>
-    <tr>
-      <th scope="row">Feb</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>Otto</td>
-     
-    </tr>
-    <tr>
-      <th scope="row">Mar</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>Otto</td>
-
-    </tr>
-    <tr>
-      <th scope="row">Apr</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>Otto</td>
-
-    </tr>
-
-    <tr>
-      <th scope="row">Total</th>
-      <td>20,00000</td>
-      <td>16,00000</td>
-      <td>4,00000</td>
-      
-    </tr>
-
-   
-  </tbody>
-</table>
+ 
          </section>
 
 
@@ -408,8 +413,8 @@ nav li a.nav-link{
 function pay() {
           document.getElementById("pay").style.display = "block";
           document.getElementById("paid").style.display = "none";
-          document.getElementById("dues").style.display = "none";
-          document.getElementById("report").style.display = "none";
+          // document.getElementById("dues").style.display = "none";
+          // document.getElementById("report").style.display = "none";
           document.getElementById("create").style.display = "none";
           
         }
@@ -418,38 +423,38 @@ function pay() {
         function paid() {
           document.getElementById("paid").style.display = "block";
           document.getElementById("pay").style.display = "none";
-          document.getElementById("dues").style.display = "none";
-          document.getElementById("report").style.display = "none";
+          // document.getElementById("dues").style.display = "none";
+          // document.getElementById("report").style.display = "none";
           document.getElementById("create").style.display = "none";
           
         }
 
-        function dues() {
-          document.getElementById("dues").style.display = "block";
-          document.getElementById("pay").style.display = "none";
-          document.getElementById("paid").style.display = "none";
-          document.getElementById("report").style.display = "none";
-          document.getElementById("create").style.display = "none";
+        // function dues() {
+        //   document.getElementById("dues").style.display = "block";
+        //   document.getElementById("pay").style.display = "none";
+        //   document.getElementById("paid").style.display = "none";
+        //   // document.getElementById("report").style.display = "none";
+        //   document.getElementById("create").style.display = "none";
           
-        }
+        // }
 
         function create() {
-          document.getElementById("dues").style.display = "none";
+          // document.getElementById("dues").style.display = "none";
           document.getElementById("pay").style.display = "none";
           document.getElementById("paid").style.display = "none";
-          document.getElementById("report").style.display = "none";
+          // document.getElementById("report").style.display = "none";
           document.getElementById("create").style.display = "block";
           
         }
 
-        function report() {
-          document.getElementById("dues").style.display = "none";
-          document.getElementById("pay").style.display = "none";
-          document.getElementById("paid").style.display = "none";
-          document.getElementById("create").style.display = "none";
-          document.getElementById("report").style.display = "block";
+        // function report() {
+        //   document.getElementById("dues").style.display = "none";
+        //   document.getElementById("pay").style.display = "none";
+        //   document.getElementById("paid").style.display = "none";
+        //   document.getElementById("create").style.display = "none";
+        //   document.getElementById("report").style.display = "block";
           
-        }
+        // }
 
 
 
@@ -468,12 +473,19 @@ confirmButtonText: `Yes`
 }).then((result) => {
 /* Read more about isConfirmed, isDenied below */
 if (result.isConfirmed) {
-  window.location = "../home.php";
+  window.location = "signout.php";
   
 } 
 })
 
 }
+</script>
+
+<!-- this code will stope resubmission of data after refreshing page -->
+<script>
+    if ( window.history.replaceState ) {
+        window.history.replaceState( null, null, window.location.href );
+    }
 </script>
 
 <script src="../assets/js/sweetalert.js"></script>

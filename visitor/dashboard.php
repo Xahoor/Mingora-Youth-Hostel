@@ -1,3 +1,20 @@
+<?php
+	session_start();
+	if(!isset($_SESSION["user_email"]) || !isset($_SESSION["user_password"])){
+		header("location: ../home.php");
+	}
+
+	require '../connection.php';
+  ob_start();
+    $userid = $_SESSION["user_id"];
+
+
+    $user_data = mysqli_query($conn,"select * from visitors where id = '$userid' ");
+
+    $data = mysqli_fetch_array($user_data);
+    
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,7 +86,16 @@ nav li .texts{
 
     <li class="nav-item">
         <a class="nav-link image" href="profile.php" role="button" >
-          <img src="../assets/images/obaid.jpg" alt="image"><span class="named">Obaid</span>
+          <?php
+          if($data['picture'] == ''){ 
+          ?>
+          <img src="../assets/images/students.jpg" alt="image"><span class="named"> 
+          <?php } else{?>
+          <img src="../assets/images/<?php echo $data['picture']; ?>" alt="image">
+
+            <?php } ?>
+          <span class="named"><?php $un = $data["name"]; 
+                    echo strtok($un, " "); ?></span>
         </a>
     </li>
 
@@ -215,25 +241,40 @@ nav li .texts{
     <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
     <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
   </ol>
+ 
   <div class="carousel-inner">
-    <div class="carousel-item active dark-overlay">
-      <a href="room_info.php">
-      <img src="../assets/images/room.jpg" class="img-fluid tales" alt="...">
+
+  <?php
+
+$rooms = mysqli_query($conn,"select * from rooms");
+$c=1;
+while($r = mysqli_fetch_array($rooms)){
+  $rid = $r["rid"];
+  $rno =$r["room_no"];
+  $b = mysqli_query($conn,"select * from allotte_room where rid='$rid'");
+  if(mysqli_num_rows($b)>0){
+  }
+  else{
+
+    $room_pic = mysqli_fetch_array(mysqli_query($conn,"select * from room_pictures where rid='$rid'"));
+  ?>
+    <div class="carousel-item <?php if($c<=1){ echo 'active';} ?>">
+      <a href="room_info.php?room_id=<?php echo $rid; ?>">
+      <img src="../assets/images/<?php echo $room_pic["picture"]; ?>" class="img-fluid tales" alt="...">
       <div class="carousel-caption d-md-block ">
-        <h5><span>Room No 3</span> </h5><br>
+        <h5><span>Room No <?php echo $rno; ?></span> </h5><br>
       </div></a> 
     </div>
 
-    <div class="carousel-item">
-      <!-- <img src="../assets/images/washroom.jpg" class="d-block w-100 tales" alt="..."> -->
+    <?php
+ $c++;
+}
 
-      <a href="room_info.php">
-      <img src="../assets/images/washroom.jpg" class="img-fluid tales" alt="...">
-      <div class="carousel-caption d-md-block ">
-        <h5><span>Room No 8</span> </h5><br>
-      </div></a> 
-      
-    </div>
+}
+
+?>
+
+    
    
   <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -312,20 +353,38 @@ nav li .texts{
 </table></section>
 
 <section  id="complained" class="complain">
-<form action="">
+
+<?php
+
+      if(isset($_POST["complain"])){
+       $sub= $_POST["subject"];
+       $desc= $_POST["description"];
+       $date=date("Y/m/d");
+       if(mysqli_query($conn,"insert into visitor_complains(id,subject,complain,date) values('$userid','$sub','$desc','$date')")){
+         ?>
+
+<script>
+  alert("Complain Send");
+</script>
+<?php
+       }
+
+      }
+?>
+<form action="dashboard.php" method="post">
 
 <div class="form-group">
     <label for="exampleFormControlInput1">Subject</label>
-    <input type="text" class="form-control" id="exampleFormControlInput1">
+    <input type="text" name="subject" class="form-control" id="exampleFormControlInput1">
   </div>
 
   <div class="form-group">
   <label for="exampleFormControlTextarea1"> textarea</label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+    <textarea class="form-control" name="description" id="exampleFormControlTextarea1" rows="3"></textarea>
   </div>
   
   <div class="form-group complain-btn">
-      <input type="submit" value="Send">
+      <input type="submit" name="complain" value="Send">
   </div>
 
 </form>
@@ -369,24 +428,22 @@ nav li .texts{
           <h3>Announcements</h3>
           <div class="announce-body">
               
-              <p> <span>[ 12 sep ]</span>: Junaid got first poisition in oxford <hr> </p>
-
-              <p> <span>[ 21 Jul ]</span>:Junaid got first poisition in oxford <hr> </p>
-
-              <p> <span>[02 May]</span>: Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford Junaid got first poisition in oxford <hr> </p>
-              <p> <span>[ 01 May ]</span>: Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford Junaid got first poisition in oxford 
-              Junaid got first poisition in oxford Junaid got first poisition in oxford Junaid got first poisition in oxford <hr> </p>
+          <?php
+             $ann= mysqli_query($conn,"select * from annoncements");
+             while($a = mysqli_fetch_array($ann)){
+              
+            
+          ?>
+              <p> <span>[ <?php echo date('d', strtotime($a['date'])); $month = date('m', strtotime($a['date']));
+              if($month==1) echo " "."Jan"; else if($month==2) echo " "."Feb"; else if($month==3) echo " "."Mar"; 
+              else if($month==4) echo " "."Apr"; else if($month==5) echo " "."May"; else if($month==6) echo " "."Jun";
+              else if($month==7) echo " "."Jul"; else if($month==8) echo " "."Aug"; else if($month==9) echo " "."Sep";
+              else if($month==10) echo " "."Oct"; else if($month==11) echo " "."Nov"; else if($month==12) echo " "."Dec";
+               ?> ]</span>: <?php echo $a["description"]; ?> <hr> </p>
+<?php
+ }
+?>
+             
               
           </div>
         </div>
@@ -407,7 +464,7 @@ nav li .texts{
 }).then((result) => {
   /* Read more about isConfirmed, isDenied below */
   if (result.isConfirmed) {
-    window.location = "../home.php";
+    window.location = "signout.php";
     
   } 
 })
